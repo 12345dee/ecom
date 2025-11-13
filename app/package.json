@@ -1,0 +1,15 @@
+{
+  "name": "ecom-sample",
+  "version": "1.0.0",
+  "description": "Advanced CI/CD ecom sample",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha --reporter spec",
+    "test:unit": "mocha --reporter spec",
+    "lint": "echo 'lint (add eslint later)'"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": { "express": "^4.18.2" },
+  "devDependencies": { "mocha": "^10.0.0", "chai": "^4.3.7", "supertest": "^6.3.3" }
+}
