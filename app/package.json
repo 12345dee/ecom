@@ -1,7 +1,7 @@
 {
   "name": "ecom-sample",
   "version": "1.0.0",
-  "description": "Advanced CI/CD ecom sample",
+  "description": "Advanced CI/CD ecom new sample",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
