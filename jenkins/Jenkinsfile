@@ -1,39 +1,64 @@
 pipeline {
   agent any
+
   environment {
     IMAGE = "REPLACE_WITH_YOUR_DOCKERHUB_OR_ECR_IMAGE"
     TAG = "${env.BRANCH_NAME == null ? env.BUILD_NUMBER : env.BRANCH_NAME}-${env.BUILD_NUMBER}"
   }
-  options { timestamps() ansiColor('xterm') }
+
+  options {
+    timestamps()
+  }
+
   stages {
-    stage('Checkout') { steps { checkout scm } }
+
+    stage('Checkout') { 
+      steps { 
+        checkout scm 
+      } 
+    }
+
     stage('Install & Test') {
       steps {
-        sh 'node -v || true'
-        sh 'cd app && npm install'
-        sh 'cd app && npm test'
-      }
-    }
-    stage('Build Docker Image') {
-      steps {
-        sh "docker build -t ${IMAGE}:${TAG} -f docker/Dockerfile ."
-        sh "docker tag ${IMAGE}:${TAG} ${IMAGE}:latest"
-      }
-    }
-    stage('Push Image') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-          sh "docker push ${IMAGE}:${TAG}"
-          sh "docker push ${IMAGE}:latest"
+        ansiColor('xterm') {
+          sh 'node -v || true'
+          sh 'cd app && npm install'
+          sh 'cd app && npm test'
         }
       }
     }
+
+    stage('Build Docker Image') {
+      steps {
+        ansiColor('xterm') {
+          sh "docker build -t ${IMAGE}:${TAG} -f docker/Dockerfile ."
+          sh "docker tag ${IMAGE}:${TAG} ${IMAGE}:latest"
+        }
+      }
+    }
+
+    stage('Push Image') {
+      steps {
+        ansiColor('xterm') {
+          withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+            sh "docker push ${IMAGE}:${TAG}"
+            sh "docker push ${IMAGE}:latest"
+          }
+        }
+      }
+    }
+
     stage('Deploy (ECS)') {
       steps {
-        echo 'ECS deploy / Blue-Green handled by separate scripts or Jenkins stages (configure ECR/ECS variables)'
+        echo 'ECS deploy will run here (ECR/ECS automation script)'
       }
     }
   }
-  post { always { sh 'docker image prune -f || true' } }
+
+  post { 
+    always { 
+      sh 'docker image prune -f || true' 
+    } 
+  }
 }
